@@ -1,0 +1,9 @@
+{
+  "name": "navband-roundabout-simulator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser-based simulator for testing the NavBand roundabout resolver with Valhalla/OSM.",
+  "type": "module",
+  "scripts": { "test": "node tests/resolver.test.mjs" },
+  "engines": { "node": ">=20" }
+}

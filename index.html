@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NavBand Roundabout Simulator</title>
+  <meta name="description" content="Simulator for the NavBand roundabout resolver using Valhalla and OpenStreetMap.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <div class="eyebrow">NAVBAND LABORATORY</div>
+    <h1>Roundabout Simulator</h1>
+    <p>Maps decide la navigazione · Valhalla interpreta la geometria locale.</p>
+  </div>
+  <div class="status-pill" id="statusPill">REPLAY</div>
+</header>
+
+<main class="workspace">
+  <aside class="panel controls">
+    <section>
+      <h2>Scenario</h2>
+      <label>Mode
+        <select id="modeSelect"><option value="replay">Replay</option><option value="live">Live</option></select>
+      </label>
+      <label>Scenario
+        <select id="scenarioSelect"></select>
+      </label>
+      <div class="button-row">
+        <button id="loadScenarioBtn" class="secondary">Carica</button>
+        <button id="saveScenarioBtn" class="secondary">Salva JSON</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Maps input simulato</h2>
+      <label>Manovra
+        <select id="maneuverSelect">
+          <option value="ROUNDABOUT">ROUNDABOUT</option>
+          <option value="LEFT">LEFT</option>
+          <option value="RIGHT">RIGHT</option>
+          <option value="STRAIGHT">STRAIGHT</option>
+          <option value="U_TURN">U_TURN</option>
+        </select>
+      </label>
+      <label>Strada attuale<input id="currentRoad" type="text" placeholder="Via Napoli"></label>
+      <label>Strada successiva / target<input id="targetRoad" type="text" placeholder="Via Roma"></label>
+      <label>Exit attesa <span class="hint">(solo test)</span><input id="expectedExit" type="number" min="1" max="12" placeholder="2"></label>
+      <label>Heading (°)<input id="heading" type="number" min="0" max="359" step="0.1" placeholder="82"></label>
+    </section>
+
+    <section>
+      <h2>Posizione</h2>
+      <div class="two-col">
+        <label>Latitudine<input id="lat" type="number" step="0.000001"></label>
+        <label>Longitudine<input id="lon" type="number" step="0.000001"></label>
+      </div>
+      <div class="two-col">
+        <label>Target lat<input id="targetLat" type="number" step="0.000001"></label>
+        <label>Target lon<input id="targetLon" type="number" step="0.000001"></label>
+      </div>
+      <div class="button-row">
+        <button id="locateBtn" class="secondary">Usa GPS browser</button>
+        <button id="clearMapBtn" class="secondary">Pulisci mappa</button>
+      </div>
+    </section>
+
+    <section id="liveSettings">
+      <h2>Valhalla</h2>
+      <label>API base URL<input id="valhallaBase" type="url" value="https://valhalla1.openstreetmap.de"></label>
+      <label>API key <span class="hint">(opzionale)</span><input id="apiKey" type="password" autocomplete="off"></label>
+      <label>Client ID<input id="clientId" type="text" value="NavBand-Roundabout-Simulator/0.1"></label>
+    </section>
+
+    <button id="analyzeBtn" class="primary">ANALIZZA SCENARIO</button>
+    <p class="small-note">Replay non usa la rete. Live usa /route e /locate: il risultato Valhalla è una baseline di test, non un secondo navigatore da sostituire a Maps.</p>
+  </aside>
+
+  <section class="map-panel"><div id="map"></div></section>
+
+  <aside class="panel results">
+    <section>
+      <div class="result-header"><h2>Risultato</h2><div id="confidenceBadge" class="badge neutral">—</div></div>
+      <div class="hero-result">
+        <div class="label">USCITA CANDIDATA</div>
+        <div id="exitValue" class="exit-number">—</div>
+        <div id="scoreValue" class="score">Score —</div>
+      </div>
+      <div id="summaryText" class="summary">Nessuna analisi eseguita.</div>
+    </section>
+
+    <section><h2>Segnali</h2><div id="signals" class="signals"></div></section>
+    <section><h2>Uscite / confronto</h2><div id="exitTable" class="exit-table empty">Esegui un'analisi per vedere i dati.</div></section>
+    <section><h2>Debug</h2><pre id="debugOutput" class="debug"></pre></section>
+  </aside>
+</main>
+
+<footer><span>NavBand Roundabout Simulator v0.1</span><span>Leaflet + OpenStreetMap + Valhalla</span></footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

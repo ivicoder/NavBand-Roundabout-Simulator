@@ -1,0 +1,121 @@
+[
+  {
+    "id": "replay-exit-2-clear",
+    "name": "Replay — uscita 2, strada chiara",
+    "maneuver": "ROUNDABOUT",
+    "currentRoad": "Via Napoli",
+    "targetRoad": "Via Roma",
+    "expectedExit": 2,
+    "heading": 82,
+    "lat": 41.9,
+    "lon": 12.49,
+    "targetLat": 41.9015,
+    "targetLon": 12.501,
+    "fixture": {
+      "locate": [
+        {"edges":[{"edge_info":{"names":["Via Napoli"]},"edge":{"access":{"car":true}}}]},
+        {"edges":[{"edge_info":{"names":["Via Roma"]},"edge":{"access":{"car":true}}}]}
+      ],
+      "route": {
+        "trip": {
+          "summary":{"length":1.2,"time":180},
+          "legs":[{"maneuvers":[
+            {"type":1,"street_names":["Via Napoli"],"instruction":"Parti su Via Napoli."},
+            {"type":26,"street_names":["Rotatoria"],"instruction":"Entra nella rotatoria."},
+            {"type":27,"street_names":["Rotatoria"],"roundabout_exit_count":2,"instruction":"Prendi la 2a uscita."},
+            {"type":10,"street_names":["Via Roma"],"instruction":"Svolta su Via Roma."}
+          ]}]
+        }
+      }
+    }
+  },
+  {
+    "id": "replay-exit-3-normalized",
+    "name": "Replay — uscita 3, nome con accento",
+    "maneuver": "ROUNDABOUT",
+    "currentRoad": "Corso Garibaldi",
+    "targetRoad": "Via Sant'Agostino",
+    "expectedExit": 3,
+    "heading": 140,
+    "lat": 41.905,
+    "lon": 12.495,
+    "targetLat": 41.908,
+    "targetLon": 12.51,
+    "fixture": {
+      "locate": [
+        {"edges":[{"edge_info":{"names":["Corso Garibaldi"]},"edge":{"access":{"car":true}}}]},
+        {"edges":[{"edge_info":{"names":["Via Sant’Agostino"]},"edge":{"access":{"car":true}}}]}
+      ],
+      "route": {
+        "trip": {
+          "summary":{"length":2.1,"time":290},
+          "legs":[{"maneuvers":[
+            {"type":1,"street_names":["Corso Garibaldi"]},
+            {"type":26,"street_names":["Rotatoria"]},
+            {"type":27,"street_names":["Rotatoria"],"roundabout_exit_count":3},
+            {"type":10,"street_names":["Via Sant’Agostino"]}
+          ]}]
+        }
+      }
+    }
+  },
+  {
+    "id": "replay-mismatch",
+    "name": "Replay — mismatch strada/uscita",
+    "maneuver": "ROUNDABOUT",
+    "currentRoad": "Via Napoli",
+    "targetRoad": "Via Roma",
+    "expectedExit": 2,
+    "heading": 82,
+    "lat": 41.91,
+    "lon": 12.48,
+    "targetLat": 41.915,
+    "targetLon": 12.49,
+    "fixture": {
+      "locate": [
+        {"edges":[{"edge_info":{"names":["Via Napoli"]},"edge":{"access":{"car":true}}}]},
+        {"edges":[{"edge_info":{"names":["Via Torino"]},"edge":{"access":{"car":true}}}]}
+      ],
+      "route": {
+        "trip": {
+          "summary":{"length":1.8,"time":240},
+          "legs":[{"maneuvers":[
+            {"type":1,"street_names":["Via Napoli"]},
+            {"type":26,"street_names":["Rotatoria"]},
+            {"type":27,"street_names":["Rotatoria"],"roundabout_exit_count":2},
+            {"type":10,"street_names":["Via Torino"]}
+          ]}]
+        }
+      }
+    }
+  },
+  {
+    "id": "replay-no-exit",
+    "name": "Replay — nessun numero di uscita",
+    "maneuver": "ROUNDABOUT",
+    "currentRoad": "Via A",
+    "targetRoad": "Via B",
+    "expectedExit": 2,
+    "heading": 225,
+    "lat": 41.89,
+    "lon": 12.47,
+    "targetLat": 41.892,
+    "targetLon": 12.478,
+    "fixture": {
+      "locate": [
+        {"edges":[{"edge_info":{"names":["Via A"]},"edge":{"access":{"car":true}}}]},
+        {"edges":[{"edge_info":{"names":["Via B"]},"edge":{"access":{"car":true}}}]}
+      ],
+      "route": {
+        "trip": {
+          "summary":{"length":0.8,"time":120},
+          "legs":[{"maneuvers":[
+            {"type":1,"street_names":["Via A"]},
+            {"type":8,"street_names":["Rotatoria"]},
+            {"type":10,"street_names":["Via B"]}
+          ]}]
+        }
+      }
+    }
+  }
+]
