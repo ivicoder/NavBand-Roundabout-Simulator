@@ -340,6 +340,103 @@ if(roundaboutManeuver){
 if(roundaboutPoints.length){
   const roundaboutLocate=await valhallaLocatePoints(config,roundaboutPoints);
 
+  console.log("=== ROUNDABOUT RADIAL PROBES ===");
+
+  const probeSource = roundaboutPoints.length ? roundaboutPoints : selectedPoints;
+  const center = probeSource.reduce(
+    (acc,p) => ({
+      lat: acc.lat + Number(p.lat) / probeSource.length,
+      lon: acc.lon + Number(p.lon) / probeSource.length
+    }),
+    {lat:0,lon:0}
+  );
+
+  const probePoints = [];
+  const earthRadius = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const toDeg = r => r * 180 / Math.PI;
+
+  // Probe a due distanze dalla corona per intercettare le strade
+  // che si staccano dalla rotonda, evitando di usare roundabout_exit_count.
+  for (const radius of [55, 75]) {
+    for (let bearing = 0; bearing < 360; bearing += 15) {
+      const br = toRad(bearing);
+      const lat1 = toRad(center.lat);
+      const lon1 = toRad(center.lon);
+      const d = radius / earthRadius;
+
+      const lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(d) +
+        Math.cos(lat1) * Math.sin(d) * Math.cos(br)
+      );
+
+      const lon2 =
+        lon1 +
+        Math.atan2(
+          Math.sin(br) * Math.sin(d) * Math.cos(lat1),
+          Math.cos(d) - Math.sin(lat1) * Math.sin(lat2)
+        );
+
+      probePoints.push({
+        lat: toDeg(lat2),
+        lon: toDeg(lon2),
+        radius,
+        bearing
+      });
+    }
+  }
+
+  const radialLocate = await valhallaLocatePoints(config, probePoints);
+
+  const radialEdges = [];
+  const radialSeen = new Set();
+
+  for (let i = 0; i < radialLocate.length; i++) {
+    const result = radialLocate[i];
+    for (const edge of result?.edges || []) {
+      const info = edge?.edge_info || {};
+      const names = Array.isArray(info.names) ? info.names : [];
+      const access = edge?.edge?.access || {};
+      const classification = edge?.edge?.classification || {};
+
+      const normalized = {
+        edgeId: edge?.edge_id?.value ?? null,
+        wayId: info.way_id ?? null,
+        names,
+        roundabout: Boolean(edge?.edge?.round_about),
+        auto: access.car !== false,
+        forward: edge?.edge?.forward !== false,
+        use: classification.use ?? null,
+        classification: classification.classification ?? null,
+        correlatedLat: edge?.correlated_lat ?? null,
+        correlatedLon: edge?.correlated_lon ?? null,
+        percentAlong: edge?.percent_along ?? null,
+        shape: info.shape ?? null,
+        probeRadius: probePoints[i]?.radius ?? null,
+        probeBearing: probePoints[i]?.bearing ?? null
+      };
+
+      const key = [
+        normalized.wayId,
+        normalized.names.join("|"),
+        normalized.roundabout,
+        normalized.shape
+      ].join("::");
+
+      if (!radialSeen.has(key)) {
+        radialSeen.add(key);
+        radialEdges.push(normalized);
+      }
+    }
+  }
+
+  console.log(JSON.stringify({
+    center,
+    probeCount: probePoints.length,
+    radialEdges
+  }, null, 2));
+
+
   console.log("=== ROUNDABOUT LOCATE ===");
 
   const compact=roundaboutLocate.map((item,index)=>({
