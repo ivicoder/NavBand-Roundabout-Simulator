@@ -96,6 +96,9 @@ async function analyze(){
     }else{
       if(!Number.isFinite(scenario.lat)||!Number.isFinite(scenario.lon)||!Number.isFinite(scenario.targetLat)||!Number.isFinite(scenario.targetLon)) throw new Error("In Live servono posizione corrente e target lat/lon.");
       const config=configFromUI(); [routeResult,locateResult]=await Promise.all([valhallaRoute(config,scenario),valhallaLocate(config,scenario)]);
+console.log("=== VALHALLA LOCATE ===");
+console.log(JSON.stringify(locateResult, null, 2));
+
     }
     paintRoute(routeResult); const result=analyzeScenario({scenario,routeResult,locateResult}); const evaluation=evaluateExpectedExit(result,scenario.expectedExit); state.result=result; renderResult(result,evaluation);
   }catch(error){state.result=null;$("confidenceBadge").className="badge low";$("confidenceBadge").textContent="ERROR";$("exitValue").textContent="!";$("scoreValue").textContent="Analisi non disponibile";$("summaryText").textContent=error?.message||String(error);$("debugOutput").textContent=String(error?.stack||error)}finally{$("analyzeBtn").disabled=false;$("analyzeBtn").textContent="ANALIZZA SCENARIO"}
