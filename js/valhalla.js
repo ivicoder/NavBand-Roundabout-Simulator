@@ -57,4 +57,28 @@ export async function valhallaLocate(config, scenario) {
   });
 }
 
+
+export async function valhallaLocatePoints(config, points) {
+  const locations = (points || [])
+    .filter((p) => Number.isFinite(Number(p?.lat)) && Number.isFinite(Number(p?.lon)))
+    .map((p) => ({
+      lat: Number(p.lat),
+      lon: Number(p.lon),
+    }));
+
+  if (!locations.length) return [];
+
+  const payload = {
+    verbose: true,
+    locations,
+    costing: "auto",
+  };
+
+  if (config.apiKey) payload.api_key = config.apiKey;
+
+  return postJson(`${normalizeBaseUrl(config.baseUrl)}/locate`, payload, {
+    clientId: config.clientId,
+  });
+}
+
 export { DEFAULT_BASE };

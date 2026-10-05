@@ -95,9 +95,65 @@ async function analyze(){
       const fixture=state.currentScenario?.fixture; routeResult=fixture?.route||null; locateResult=fixture?.locate||null; if(!routeResult) throw new Error("Lo scenario Replay non contiene un fixture Valhalla.");
     }else{
       if(!Number.isFinite(scenario.lat)||!Number.isFinite(scenario.lon)||!Number.isFinite(scenario.targetLat)||!Number.isFinite(scenario.targetLon)) throw new Error("In Live servono posizione corrente e target lat/lon.");
-      const config=configFromUI(); [routeResult,locateResult]=await Promise.all([valhallaRoute(config,scenario),valhallaLocate(config,scenario)]);
-console.log("=== VALHALLA LOCATE ===");
+      const config=configFromUI();
+
+routeResult=await valhallaRoute(config,scenario);
+locateResult=await valhallaLocate(config,scenario);
+
+console.log("=== VALHALLA LOCATE START/TARGET ===");
 console.log(JSON.stringify(locateResult, null, 2));
+
+const roundaboutManeuver=(routeResult?.trip?.legs||[])
+  .flatMap(leg=>leg?.maneuvers||[])
+  .find(m=>Number.isFinite(Number(m?.roundabout_exit_count)) || m?.type===26 || m?.type===27);
+
+const roundaboutPoints=[];
+if(roundaboutManeuver){
+  for(const p of [
+    {lat:roundaboutManeuver.begin_lat,lon:roundaboutManeuver.begin_lon,label:"BEGIN"},
+    {lat:roundaboutManeuver.end_lat,lon:roundaboutManeuver.end_lon,label:"END"}
+  ]){
+    if(Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lon))){
+      roundaboutPoints.push(p);
+    }
+  }
+}
+
+if(roundaboutPoints.length){
+  const roundaboutLocate=await valhallaLocatePoints(config,roundaboutPoints);
+
+  console.log("=== ROUNDABOUT LOCATE ===");
+
+  const compact=roundaboutLocate.map((item,index)=>({
+    point:roundaboutPoints[index],
+    input_lat:item?.input_lat,
+    input_lon:item?.input_lon,
+    nodes:(item?.nodes||[]).map(n=>({
+      id:n?.node_id?.value ?? n?.node_id?.id ?? null,
+      lat:n?.lat ?? null,
+      lon:n?.lon ?? null,
+      type:n?.type ?? null,
+      edge_count:n?.edge_count ?? null
+    })),
+    edges:(item?.edges||[]).map(e=>({
+      edgeId:e?.edge_id?.value ?? e?.edge_id?.id ?? null,
+      wayId:e?.edge_info?.way_id ?? null,
+      names:e?.edge_info?.names ?? [],
+      roundabout:e?.edge?.round_about === true,
+      car:e?.edge?.access?.car === true,
+      forward:e?.edge?.forward ?? null,
+      use:e?.edge?.classification?.use ?? e?.edge?.use ?? null,
+      startNode:e?.edge?.start_node?.value ?? e?.edge?.start_node?.id ?? null,
+      endNode:e?.edge?.end_node?.value ?? e?.edge?.end_node?.id ?? null,
+      correlatedLat:e?.correlated_lat ?? null,
+      correlatedLon:e?.correlated_lon ?? null,
+      percentAlong:e?.percent_along ?? null,
+      shape:e?.edge_info?.shape ?? null
+    }))
+  }));
+
+  console.log(JSON.stringify(compact,null,2));
+}
 
     }
     paintRoute(routeResult); const result=analyzeScenario({scenario,routeResult,locateResult}); const evaluation=evaluateExpectedExit(result,scenario.expectedExit); state.result=result; renderResult(result,evaluation);
