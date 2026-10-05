@@ -100,6 +100,31 @@ async function analyze(){
 routeResult=await valhallaRoute(config,scenario);
 locateResult=await valhallaLocate(config,scenario);
 
+console.log("=== ROUNDABOUT MANEUVER RAW ===");
+
+const maneuvers=(routeResult?.trip?.legs||[])
+  .flatMap(leg=>leg?.maneuvers||[]);
+
+console.log(JSON.stringify(
+  maneuvers.map((m,index)=>({
+    index,
+    type:m?.type,
+    instruction:m?.instruction,
+    verbal_pre_transition_instruction:m?.verbal_pre_transition_instruction,
+    street_names:m?.street_names,
+    begin_street_names:m?.begin_street_names,
+    roundabout_exit_count:m?.roundabout_exit_count,
+    begin_lat:m?.begin_lat,
+    begin_lon:m?.begin_lon,
+    end_lat:m?.end_lat,
+    end_lon:m?.end_lon,
+    length:m?.length,
+    time:m?.time
+  })),
+  null,
+  2
+));
+
 console.log("=== VALHALLA LOCATE START/TARGET ===");
 console.log(JSON.stringify(locateResult, null, 2));
 
