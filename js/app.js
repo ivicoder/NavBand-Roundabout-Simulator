@@ -120,7 +120,7 @@ locateResult=await valhallaLocate(config,scenario);
   if (routeLeg?.shape && rbIndex >= 0) {
     const routePoints = decodePolyline6(routeLeg.shape);
 
-    const maneuverStartMeters = maneuvers
+    const maneuverStartMeters = geometryManeuvers
       .slice(0, rbIndex)
       .reduce((sum, m) => sum + Number(m?.length || 0) * 1000, 0);
 
