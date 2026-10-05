@@ -100,6 +100,199 @@ async function analyze(){
 routeResult=await valhallaRoute(config,scenario);
 locateResult=await valhallaLocate(config,scenario);
 
+
+  // === ROUNDABOUT GEOMETRY RAW ===
+  // Ricostruisce la porzione della route corrispondente alla manovra
+  // di rotatoria e interroga Valhalla /locate sui punti della shape.
+  const { decodePolyline6, pointDistanceMeters } =
+    await import("./roundabout-geometry.js");
+
+  const legs = routeResult?.trip?.legs || [];
+  const routeLeg = legs[0] || null;
+
+  const geometryManeuvers = (routeLeg?.maneuvers || []);
+  const rbIndex = geometryManeuvers.findIndex(m =>
+    Number.isFinite(Number(m?.roundabout_exit_count)) ||
+    m?.type === 26 ||
+    m?.type === 27
+  );
+
+  if (routeLeg?.shape && rbIndex >= 0) {
+    const routePoints = decodePolyline6(routeLeg.shape);
+
+    const maneuverStartMeters = maneuvers
+      .slice(0, rbIndex)
+      .reduce((sum, m) => sum + Number(m?.length || 0) * 1000, 0);
+
+    const maneuverLengthMeters =
+      Number(geometryManeuvers[rbIndex]?.length || 0) * 1000;
+
+    const windowStart = Math.max(0, maneuverStartMeters - 35);
+    const windowEnd = maneuverStartMeters + maneuverLengthMeters + 35;
+
+    const selectedPoints = [];
+    let cumulative = 0;
+
+    for (let i = 0; i < routePoints.length; i++) {
+      if (i > 0) {
+        cumulative += pointDistanceMeters(
+          routePoints[i - 1],
+          routePoints[i]
+        );
+      }
+
+      if (cumulative >= windowStart && cumulative <= windowEnd) {
+        selectedPoints.push({
+          lat: routePoints[i].lat,
+          lon: routePoints[i].lon
+        });
+      }
+    }
+
+    // Se la shape ha pochi punti, includiamo comunque i punti
+    // immediatamente circostanti la manovra.
+    if (selectedPoints.length < 3) {
+      const center = Math.min(
+        routePoints.length - 1,
+        Math.max(0, Math.round(
+          routePoints.length *
+          ((maneuverStartMeters + maneuverLengthMeters / 2) /
+            Math.max(1, routeLeg?.summary?.length || 1))
+        ))
+      );
+
+      const from = Math.max(0, center - 4);
+      const to = Math.min(routePoints.length, center + 5);
+
+      selectedPoints.length = 0;
+
+      for (let i = from; i < to; i++) {
+        selectedPoints.push({
+          lat: routePoints[i].lat,
+          lon: routePoints[i].lon
+        });
+      }
+    }
+
+    const rbLocate = await valhallaLocatePoints(
+      config,
+      selectedPoints
+    );
+
+    const edgeMap = new Map();
+
+    for (const result of rbLocate || []) {
+      for (const edge of result?.edges || []) {
+        const edgeId =
+          edge?.edge_id?.value ??
+          edge?.edge_id?.id ??
+          `${edge?.edge_info?.way_id}:${edge?.edge?.forward}`;
+
+        if (!edgeMap.has(String(edgeId))) {
+          edgeMap.set(String(edgeId), edge);
+        }
+      }
+    }
+
+    const roundaboutEdges = [];
+    const adjacentAutoEdges = [];
+
+    for (const edge of edgeMap.values()) {
+      const compact = {
+        edgeId:
+          edge?.edge_id?.value ??
+          edge?.edge_id?.id ??
+          null,
+
+        wayId:
+          edge?.edge_info?.way_id ??
+          null,
+
+        names:
+          edge?.edge_info?.names ??
+          [],
+
+        roundabout:
+          edge?.edge?.round_about === true,
+
+        auto:
+          edge?.edge?.access?.car === true,
+
+        forward:
+          edge?.edge?.forward ??
+          null,
+
+        use:
+          edge?.edge?.classification?.use ??
+          edge?.edge?.use ??
+          null,
+
+        classification:
+          edge?.edge?.classification?.classification ??
+          null,
+
+        startNode:
+          edge?.edge?.start_node?.value ??
+          edge?.edge?.start_node?.id ??
+          null,
+
+        endNode:
+          edge?.edge?.end_node?.value ??
+          edge?.edge?.end_node?.id ??
+          null,
+
+        correlatedLat:
+          edge?.correlated_lat ??
+          null,
+
+        correlatedLon:
+          edge?.correlated_lon ??
+          null,
+
+        percentAlong:
+          edge?.percent_along ??
+          null,
+
+        shape:
+          edge?.edge_info?.shape ??
+          null
+      };
+
+      if (compact.roundabout) {
+        roundaboutEdges.push(compact);
+      } else if (compact.auto) {
+        adjacentAutoEdges.push(compact);
+      }
+    }
+
+    console.log("=== ROUNDABOUT GEOMETRY RAW ===");
+    console.log(JSON.stringify({
+      maneuverIndex: rbIndex,
+      maneuver: {
+        type: geometryManeuvers[rbIndex]?.type ?? null,
+        instruction: geometryManeuvers[rbIndex]?.instruction ?? null,
+        roundabout_exit_count:
+          geometryManeuvers[rbIndex]?.roundabout_exit_count ?? null,
+        length:
+          geometryManeuvers[rbIndex]?.length ?? null
+      },
+      maneuverStartMeters,
+      maneuverLengthMeters,
+      windowStart,
+      windowEnd,
+      selectedPoints,
+      roundaboutEdges,
+      adjacentAutoEdges
+    }, null, 2));
+  } else {
+    console.log("=== ROUNDABOUT GEOMETRY RAW ===");
+    console.log(JSON.stringify({
+      error: "Impossibile isolare la geometria della rotatoria",
+      hasRouteShape: Boolean(routeLeg?.shape),
+      roundaboutManeuverIndex: rbIndex
+    }, null, 2));
+  }
+
 console.log("=== ROUNDABOUT MANEUVER RAW ===");
 
 const maneuvers=(routeResult?.trip?.legs||[])

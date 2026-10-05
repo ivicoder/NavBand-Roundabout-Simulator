@@ -1,16 +1,3 @@
-/**
- * RoundaboutResolver
- *
- * Nuovo resolver geometrico.
- *
- * In questa fase:
- * - riceve routeResult + locateResult reali;
- * - normalizza gli edge Valhalla;
- * - prepara il contesto della rotatoria;
- * - NON sostituisce ancora resolver.js;
- * - NON modifica ancora exit/confidence.
- */
-
 export class RoundaboutResolver {
   constructor(options = {}) {
     this.options = options;
@@ -22,35 +9,77 @@ export class RoundaboutResolver {
     }
 
     const context = this.buildContext(input);
+    const exits = this.enumerateRoundaboutExits(context.roundaboutEdges);
+
+    const scored = exits
+      .map((exit, index) => ({
+        ...exit,
+        exitNumber: index + 1,
+        matchScore: this.scoreRoadMatch(exit.names, context.nextRoad)
+      }))
+      .sort((a, b) => b.matchScore - a.matchScore);
+
+    const best = scored[0] ?? null;
+    const second = scored[1] ?? null;
+
+    let confidence = "LOW";
+    let score = best?.matchScore ?? 0;
+
+    if (best && best.matchScore >= 80) {
+      confidence = "HIGH";
+    } else if (best && best.matchScore >= 50) {
+      confidence = "MEDIUM";
+    }
+
+    const reasons = [];
+
+    if (context.currentRoad) {
+      reasons.push(`current road: ${context.currentRoad}`);
+    }
+
+    if (context.nextRoad) {
+      reasons.push(`next road: ${context.nextRoad}`);
+    }
+
+    if (best) {
+      reasons.push(
+        `best exit ${best.exitNumber}: ${best.names.join(" / ") || "unnamed"}`
+      );
+    }
+
+    if (second && best && best.matchScore === second.matchScore) {
+      confidence = "LOW";
+      reasons.push("ambiguous exit match");
+    }
 
     return {
-      exitNumber: null,
-      score: 0,
-      confidence: "LOW",
-
+      exitNumber: best?.exitNumber ?? null,
+      score,
+      confidence,
       currentRoad: context.currentRoad,
       nextRoad: context.nextRoad,
-
       currentEdges: context.currentEdges,
       targetEdges: context.targetEdges,
-
       roundabout: context.roundabout,
-
-      reasons: [
-        "geometric resolver context prepared"
-      ]
+      exits: scored,
+      reasons
     };
   }
 
   buildContext(input) {
-    const currentEdges =
-      this.normalizeLocateResult(input.locateResult?.[0]);
+    const currentEdges = this.normalizeLocateResult(
+      input.locateResult?.[0]
+    );
 
-    const targetEdges =
-      this.normalizeLocateResult(input.locateResult?.[1]);
+    const targetEdges = this.normalizeLocateResult(
+      input.locateResult?.[1]
+    );
 
-    const roundabout =
-      input.roundabout ?? null;
+    const roundaboutEdges = this.normalizeRoundaboutEdges(
+      input.roundaboutEdges ??
+      input.roundabout?.edges ??
+      []
+    );
 
     return {
       currentRoad:
@@ -63,50 +92,49 @@ export class RoundaboutResolver {
 
       currentEdges,
       targetEdges,
-      roundabout
+
+      roundabout:
+        input.roundabout ?? null,
+
+      roundaboutEdges
     };
   }
 
   normalizeLocateResult(result) {
-    const items = Array.isArray(result)
+    if (!result) return [];
+
+    const edges = Array.isArray(result)
       ? result
-      : result
-        ? [result]
+      : Array.isArray(result.edges)
+        ? result.edges
         : [];
 
-    const edges = [];
+    return edges
+      .map(edge => this.normalizeEdge(edge))
+      .filter(Boolean);
+  }
 
-    for (const item of items) {
-      for (const edge of item?.edges || []) {
-        const normalized = this.normalizeEdge(edge);
+  normalizeRoundaboutEdges(edges) {
+    if (!Array.isArray(edges)) return [];
 
-        if (normalized) {
-          edges.push(normalized);
-        }
-      }
-    }
-
-    return edges;
+    return edges
+      .map(edge => this.normalizeEdge(edge))
+      .filter(Boolean);
   }
 
   normalizeEdge(edge) {
-    if (!edge || typeof edge !== "object") {
-      return null;
-    }
+    if (!edge) return null;
 
-    const edgeInfo =
-      edge.edge_info ?? {};
+    const edgeInfo = edge.edge_info ?? {};
+    const edgeData = edge.edge ?? {};
 
-    const edgeData =
-      edge.edge ?? {};
+    const names = Array.isArray(edgeInfo.names)
+      ? edgeInfo.names
+          .filter(Boolean)
+          .map(String)
+      : [];
 
-    const names =
-      Array.isArray(edgeInfo.names)
-        ? edgeInfo.names.filter(Boolean).map(String)
-        : [];
-
-    const access =
-      edgeData.access ?? {};
+    const access = edgeData.access ?? {};
 
     return {
       id:
@@ -134,11 +162,20 @@ export class RoundaboutResolver {
         access.car === true,
 
       use:
+        edgeData.classification?.use ??
         edgeData.use ??
+        null,
+
+      classification:
+        edgeData.classification?.classification ??
         null,
 
       forward:
         edgeData.forward ??
+        null,
+
+      startNode:
+        edgeData.start_node ??
         null,
 
       endNode:
@@ -161,8 +198,8 @@ export class RoundaboutResolver {
 
   firstRoadName(edges) {
     for (const edge of edges) {
-      if (edge.names.length > 0) {
-        return edge.names[0];
+      if (Array.isArray(edge.names) && edge.names.length) {
+        return edge.names.join(" / ");
       }
     }
 
@@ -170,15 +207,57 @@ export class RoundaboutResolver {
   }
 
   enumerateRoundaboutExits(roundaboutEdges) {
-    if (!Array.isArray(roundaboutEdges)) {
-      return [];
-    }
+    if (!Array.isArray(roundaboutEdges)) return [];
 
     return roundaboutEdges
-      .map((edge) => this.normalizeEdge(edge))
-      .filter(Boolean)
-      .filter((edge) => edge.auto)
-      .filter((edge) => !edge.roundabout);
+      .filter(edge => edge.auto)
+      .filter(edge => !edge.roundabout);
+  }
+
+  scoreRoadMatch(names, targetRoad) {
+    if (!targetRoad || !Array.isArray(names) || !names.length) {
+      return 0;
+    }
+
+    const target = this.normalizeRoadName(targetRoad);
+
+    let best = 0;
+
+    for (const name of names) {
+      const candidate = this.normalizeRoadName(name);
+
+      if (!candidate) continue;
+
+      if (candidate === target) {
+        best = Math.max(best, 100);
+        continue;
+      }
+
+      const targetParts = target.split(" ");
+      const candidateParts = candidate.split(" ");
+
+      const common = targetParts.filter(
+        part => candidateParts.includes(part)
+      );
+
+      if (common.length >= 2) {
+        best = Math.max(best, 70);
+      } else if (common.length === 1) {
+        best = Math.max(best, 40);
+      }
+    }
+
+    return best;
+  }
+
+  normalizeRoadName(value) {
+    return String(value ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[\/,.;()_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 }
 
