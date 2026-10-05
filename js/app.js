@@ -1,4 +1,4 @@
-import { DEFAULT_BASE, valhallaLocate, valhallaRoute } from "./valhalla.js";
+import { DEFAULT_BASE, valhallaLocate, valhallaLocatePoints, valhallaRoute } from "./valhalla.js";
 import { analyzeScenario, evaluateExpectedExit } from "./resolver.js";
 
 const $ = (id) => document.getElementById(id);
