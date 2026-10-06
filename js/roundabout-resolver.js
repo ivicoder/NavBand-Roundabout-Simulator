@@ -363,13 +363,31 @@ export class RoundaboutResolver {
         this.numberOrNull(
           edge.probeBearing ??
           edge.probe_bearing
+        ),
+
+      probeRadius:
+        this.numberOrNull(
+          edge.probeRadius ??
+          edge.probe_radius
         )
     };
   }
 
   buildBranches(edges, center) {
+    const nearEdges =
+      edges.filter(
+        edge =>
+          Number.isFinite(edge.probeRadius) &&
+          edge.probeRadius <= 55
+      );
+
+    const sourceEdges =
+      nearEdges.length
+        ? nearEdges
+        : edges;
+
     const usable =
-      edges
+      sourceEdges
         .filter(
           edge => edge.auto !== false
         )
@@ -487,11 +505,16 @@ export class RoundaboutResolver {
                 )
             );
 
-          const roadScore =
+          const rawRoadScore =
             this.scoreRoadMatch(
               branch.names,
               context.currentRoad
             );
+
+          const roadScore =
+            rawRoadScore >= 82
+              ? rawRoadScore
+              : 0;
 
           const angleScore =
             currentBearing == null
@@ -526,9 +549,18 @@ export class RoundaboutResolver {
       return null;
     }
 
+    const entryAngle =
+      currentBearing == null
+        ? Infinity
+        : this.angularDistance(
+            best.branch.bearing,
+            currentBearing
+          );
+
     if (
       !best.wayMatch &&
-      best.roadScore === 0
+      best.roadScore === 0 &&
+      entryAngle > 45
     ) {
       return null;
     }
