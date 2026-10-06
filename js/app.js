@@ -141,8 +141,7 @@ const LIVE_TESTS = {
     heading: "",
     lat: 41.06149,
     lon: 14.33815,
-    targetLat: 41.05740,
-    targetLon: 14.34130
+    targetLat: 41.059500, targetLon: 14.340600
   },
   "test-f-live": {
     id: "test-f-live",
