@@ -66,7 +66,7 @@ export class RoundaboutResolver {
     const entryStrong =
       Boolean(
         entry &&
-        entry.score >= 500
+        entry.entryScore >= 500
       );
 
     const targetStrong =
@@ -436,49 +436,52 @@ export class RoundaboutResolver {
         false
       );
 
-    return (
-      branches
-        .map(branch => {
-          const wayMatch =
-            branch.wayIds.some(
-              id =>
-                currentWayIds.has(
-                  String(id)
-                )
-            );
+    const best = branches
+      .map(branch => {
+        const wayMatch =
+          branch.wayIds.some(
+            id =>
+              currentWayIds.has(
+                String(id)
+              )
+          );
 
-          const roadScore =
-            this.scoreRoadMatch(
-              branch.names,
-              context.currentRoad
-            );
+        const roadScore =
+          this.scoreRoadMatch(
+            branch.names,
+            context.currentRoad
+          );
 
-          const angleScore =
-            firstRouteBearing == null
-              ? 0
-              : Math.max(
-                  0,
-                  100 -
-                    this.angularDistance(
-                      branch.bearing,
-                      firstRouteBearing
-                    )
-                );
+        const angleScore =
+          firstRouteBearing == null
+            ? 0
+            : Math.max(
+                0,
+                100 -
+                  this.angularDistance(
+                    branch.bearing,
+                    firstRouteBearing
+                  )
+              );
 
-          return {
-            branch,
-            score:
-              (wayMatch ? 1000 : 0) +
-              roadScore * 5 +
-              angleScore
-          };
-        })
-        .sort(
-          (a, b) =>
-            b.score - a.score
-        )[0]?.branch ??
-      null
-    );
+        return {
+          branch,
+          score:
+            (wayMatch ? 1000 : 0) +
+            roadScore * 5 +
+            angleScore
+        };
+      })
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      )[0];
+
+    if (!best) return null;
+
+    best.branch.entryScore = best.score;
+
+    return best.branch;
   }
 
   findTargetBranch(branches, context) {
