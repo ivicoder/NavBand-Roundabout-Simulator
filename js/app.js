@@ -1,3 +1,52 @@
+
+/* ============================================================
+   NAVBAND RADIAL PROBES CAPTURE
+   ============================================================ */
+(() => {
+  if (window.__navbandRadialCaptureInstalled) return;
+
+  window.__navbandRadialCaptureInstalled = true;
+
+  const originalConsoleLog = console.log;
+
+  console.log = function (...args) {
+    try {
+      for (const arg of args) {
+        if (typeof arg !== "string") continue;
+
+        if (
+          arg.includes('"radialEdges"') &&
+          arg.includes('"probeCount"') &&
+          arg.includes('"center"')
+        ) {
+          try {
+            const parsed = JSON.parse(arg);
+
+            if (
+              parsed &&
+              Array.isArray(parsed.radialEdges)
+            ) {
+              window.__navbandRadialProbes = parsed;
+
+              window.dispatchEvent(
+                new CustomEvent("navband:radial-probes", {
+                  detail: parsed
+                })
+              );
+            }
+          } catch (_) {
+            // Il log non era JSON valido: ignoriamo.
+          }
+        }
+      }
+    } catch (_) {
+      // La diagnostica non deve mai rompere console.log.
+    }
+
+    return originalConsoleLog.apply(console, args);
+  };
+})();
+
 import { DEFAULT_BASE, valhallaLocate, valhallaLocatePoints, valhallaRoute } from "./valhalla.js";
 import { analyzeScenario, evaluateExpectedExit } from "./resolver.js";
 
@@ -487,3 +536,634 @@ function setupEvents(){
 }
 async function main(){initMap();setupEvents();setModeUI();try{await loadScenarios()}catch(e){$("summaryText").textContent=`Errore caricamento scenari: ${e.message}`}}
 main();
+
+
+
+/* ============================================================
+   NAVBAND RADIAL PROBES DIAGNOSTIC UI
+   ============================================================ */
+(() => {
+  if (window.__navbandRadialUIInstalled) return;
+
+  window.__navbandRadialUIInstalled = true;
+
+  function start() {
+    if (!document.body) {
+      setTimeout(start, 50);
+      return;
+    }
+
+    if (document.getElementById("navbandRadialPanel")) {
+      return;
+    }
+
+    const panel = document.createElement("section");
+
+    panel.id = "navbandRadialPanel";
+
+    panel.innerHTML = `
+      <style>
+        #navbandRadialPanel {
+          box-sizing: border-box;
+          width: 100%;
+          margin: 18px 0;
+          padding: 14px;
+          border: 1px solid #999;
+          border-radius: 12px;
+          background: #f7f7f7;
+          color: #111;
+          font-family: Arial, sans-serif;
+        }
+
+        #navbandRadialPanel * {
+          box-sizing: border-box;
+        }
+
+        #navbandRadialToolbar {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        #navbandRadialToolbar button {
+          min-height: 40px;
+          padding: 8px 13px;
+          border: 1px solid #777;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        #navbandTestBLive {
+          font-weight: 700 !important;
+        }
+
+        #navbandTestBStatus,
+        #navbandRadialSummary {
+          margin: 8px 0;
+          padding: 9px;
+          border-radius: 8px;
+          background: white;
+          line-height: 1.45;
+          font-size: 13px;
+        }
+
+        #navbandRadialTableWrap {
+          width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          background: white;
+        }
+
+        #navbandRadialTable {
+          width: 100%;
+          min-width: 1100px;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+
+        #navbandRadialTable th,
+        #navbandRadialTable td {
+          padding: 6px;
+          border-bottom: 1px solid #eee;
+          text-align: left;
+          vertical-align: top;
+          white-space: nowrap;
+        }
+
+        #navbandRadialTable th {
+          position: sticky;
+          top: 0;
+          background: #eee;
+          z-index: 1;
+        }
+
+        @media (max-width: 600px) {
+          #navbandRadialPanel {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 9px;
+          }
+
+          #navbandRadialToolbar {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          #navbandRadialToolbar button {
+            width: 100%;
+          }
+        }
+      </style>
+
+      <div id="navbandRadialToolbar">
+        <strong style="font-size:18px;">
+          NavBand — Radial Probes
+        </strong>
+
+        <button id="navbandTestBLive" type="button">
+          ▶ Test B Live
+        </button>
+
+        <button id="navbandClearRadial" type="button">
+          Svuota
+        </button>
+      </div>
+
+      <div id="navbandTestBStatus">
+        Test B Live non caricato.
+      </div>
+
+      <div id="navbandRadialSummary">
+        Nessun radial probe disponibile.
+      </div>
+
+      <div id="navbandRadialTableWrap">
+        <table id="navbandRadialTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Bearing</th>
+              <th>Radius</th>
+              <th>Edge ID</th>
+              <th>Way ID</th>
+              <th>Nomi</th>
+              <th>Roundabout</th>
+              <th>Auto</th>
+              <th>Lat</th>
+              <th>Lon</th>
+              <th>% Along</th>
+              <th>Classification</th>
+              <th>Use</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    `;
+
+    document.body.appendChild(panel);
+
+    function setElementValue(el, value) {
+      if (!el) return false;
+
+      el.value = value;
+
+      el.dispatchEvent(
+        new Event("input", { bubbles: true })
+      );
+
+      el.dispatchEvent(
+        new Event("change", { bubbles: true })
+      );
+
+      return true;
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    }
+
+    function allControls() {
+      return Array.from(
+        document.querySelectorAll(
+          "input, select, textarea"
+        )
+      );
+    }
+
+    function controlScore(el, candidates) {
+      const haystack = normalizeText(
+        [
+          el.id,
+          el.name,
+          el.placeholder,
+          el.getAttribute("aria-label"),
+          el.getAttribute("data-testid")
+        ].join(" ")
+      );
+
+      let score = 0;
+
+      for (const candidate of candidates) {
+        const c = normalizeText(candidate);
+
+        if (!c) continue;
+
+        if (haystack === c) {
+          score += 100;
+        } else if (haystack.includes(c)) {
+          score += 40;
+        }
+      }
+
+      const id = el.id;
+
+      if (id) {
+        const label = document.querySelector(
+          `label[for="${CSS.escape(id)}"]`
+        );
+
+        if (label) {
+          const labelText = normalizeText(
+            label.textContent
+          );
+
+          for (const candidate of candidates) {
+            const c = normalizeText(candidate);
+
+            if (labelText === c) {
+              score += 80;
+            } else if (labelText.includes(c)) {
+              score += 30;
+            }
+          }
+        }
+      }
+
+      return score;
+    }
+
+    function findControl(candidates) {
+      let best = null;
+      let bestScore = 0;
+
+      for (const el of allControls()) {
+        const score = controlScore(el, candidates);
+
+        if (score > bestScore) {
+          best = el;
+          bestScore = score;
+        }
+      }
+
+      return best;
+    }
+
+    function setField(candidates, value) {
+      const el = findControl(candidates);
+
+      if (!el) return false;
+
+      return setElementValue(el, value);
+    }
+
+    function setSelectByOption(candidates, desired) {
+      const selects = Array.from(
+        document.querySelectorAll("select")
+      );
+
+      const wanted = normalizeText(desired);
+
+      let best = null;
+      let bestScore = 0;
+
+      for (const select of selects) {
+        const score = controlScore(
+          select,
+          candidates
+        );
+
+        if (score > bestScore) {
+          best = select;
+          bestScore = score;
+        }
+      }
+
+      if (best) {
+        const option = Array.from(best.options).find(
+          o => normalizeText(o.value) === wanted ||
+               normalizeText(o.textContent) === wanted ||
+               normalizeText(o.textContent).includes(wanted)
+        );
+
+        if (option) {
+          best.value = option.value;
+
+          best.dispatchEvent(
+            new Event("input", { bubbles: true })
+          );
+
+          best.dispatchEvent(
+            new Event("change", { bubbles: true })
+          );
+
+          return true;
+        }
+      }
+
+      /*
+       * Fallback: cerca qualsiasi select che contenga
+       * l'opzione richiesta.
+       */
+      for (const select of selects) {
+        const option = Array.from(select.options).find(
+          o =>
+            normalizeText(o.value) === wanted ||
+            normalizeText(o.textContent) === wanted ||
+            normalizeText(o.textContent).includes(wanted)
+        );
+
+        if (!option) continue;
+
+        select.value = option.value;
+
+        select.dispatchEvent(
+          new Event("input", { bubbles: true })
+        );
+
+        select.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+
+        return true;
+      }
+
+      return false;
+    }
+
+    function loadTestB() {
+      /*
+       * Test B VALIDATO
+       */
+      const ok = [];
+
+      ok.push(
+        setSelectByOption(
+          ["mode", "modalita", "operation mode"],
+          "LIVE"
+        )
+      );
+
+      ok.push(
+        setSelectByOption(
+          ["maneuver", "manovra", "scenario maneuver"],
+          "ROUNDABOUT"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "currentRoad",
+            "roadCurrent",
+            "current road",
+            "strada attuale"
+          ],
+          "Via San Leucio"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "lat",
+            "currentLat",
+            "latitude",
+            "current latitude"
+          ],
+          "41.090580"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "lon",
+            "currentLon",
+            "longitude",
+            "current longitude"
+          ],
+          "14.317530"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "targetRoad",
+            "roadTarget",
+            "target road",
+            "strada target"
+          ],
+          "Via Gennaro Papa"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "targetLat",
+            "target latitude"
+          ],
+          "41.1006487"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "targetLon",
+            "target longitude"
+          ],
+          "14.3235474"
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "heading"
+          ],
+          ""
+        )
+      );
+
+      ok.push(
+        setField(
+          [
+            "expectedExit",
+            "expected exit",
+            "uscita attesa"
+          ],
+          ""
+        )
+      );
+
+      const found = ok.filter(Boolean).length;
+
+      const status =
+        document.getElementById(
+          "navbandTestBStatus"
+        );
+
+      if (status) {
+        status.innerHTML =
+          "<strong>Test B Live caricato</strong><br>" +
+          "Via San Leucio — 41.090580, 14.317530<br>" +
+          "→ Via Gennaro Papa — 41.1006487, 14.3235474<br>" +
+          "ROUNDABOUT — heading vuoto<br>" +
+          "Campi impostati: " + found + "/" + ok.length +
+          "<br><br>" +
+          "Ora premi Analyze.";
+      }
+    }
+
+    function clearRadial() {
+      const summary =
+        document.getElementById(
+          "navbandRadialSummary"
+        );
+
+      const tbody =
+        document.querySelector(
+          "#navbandRadialTable tbody"
+        );
+
+      if (summary) {
+        summary.textContent =
+          "Nessun radial probe disponibile.";
+      }
+
+      if (tbody) {
+        tbody.innerHTML = "";
+      }
+    }
+
+    function renderRadial() {
+      const dump =
+        window.__navbandRadialProbes;
+
+      const summary =
+        document.getElementById(
+          "navbandRadialSummary"
+        );
+
+      const tbody =
+        document.querySelector(
+          "#navbandRadialTable tbody"
+        );
+
+      if (!summary || !tbody) return;
+
+      if (
+        !dump ||
+        !Array.isArray(dump.radialEdges)
+      ) {
+        return;
+      }
+
+      tbody.innerHTML = "";
+
+      const center = dump.center || {};
+
+      summary.textContent =
+        "Centro: " +
+        Number(center.lat ?? 0).toFixed(6) +
+        ", " +
+        Number(center.lon ?? 0).toFixed(6) +
+        " — probes: " +
+        (dump.probeCount ?? "?") +
+        " — edge unici: " +
+        dump.radialEdges.length;
+
+      dump.radialEdges.forEach((edge, index) => {
+        const tr =
+          document.createElement("tr");
+
+        const values = [
+          index + 1,
+          edge.probeBearing ?? "",
+          edge.probeRadius ?? "",
+          edge.edgeId ?? "",
+          edge.wayId ?? "",
+          Array.isArray(edge.names)
+            ? edge.names.join(" / ")
+            : "",
+          edge.roundabout ? "YES" : "NO",
+          edge.auto ? "YES" : "NO",
+          edge.correlatedLat ?? "",
+          edge.correlatedLon ?? "",
+          edge.percentAlong ?? "",
+          edge.classification ?? "",
+          edge.use ?? ""
+        ];
+
+        for (const value of values) {
+          const td =
+            document.createElement("td");
+
+          td.textContent =
+            typeof value === "number"
+              ? Number(value).toFixed(4)
+              : String(value);
+
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    document
+      .getElementById("navbandTestBLive")
+      ?.addEventListener(
+        "click",
+        loadTestB
+      );
+
+    document
+      .getElementById("navbandClearRadial")
+      ?.addEventListener(
+        "click",
+        clearRadial
+      );
+
+    window.addEventListener(
+      "navband:radial-probes",
+      renderRadial
+    );
+
+    renderRadial();
+
+    /*
+     * L'Analyze può produrre il dump dopo parecchi secondi.
+     * Aggiornamento leggero, solo quando il riferimento cambia.
+     */
+    let lastDump = null;
+
+    setInterval(() => {
+      if (
+        window.__navbandRadialProbes &&
+        window.__navbandRadialProbes !== lastDump
+      ) {
+        lastDump =
+          window.__navbandRadialProbes;
+
+        renderRadial();
+      }
+    }, 500);
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      start,
+      { once: true }
+    );
+  } else {
+    start();
+  }
+})();
