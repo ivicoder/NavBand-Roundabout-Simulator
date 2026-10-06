@@ -44,8 +44,8 @@ export class RoundaboutResolver {
     );
 
     const entryBearing =
-      context.currentBearing ??
       entry?.bearing ??
+      context.currentBearing ??
       null;
 
     const ordered = this.orderBranches(
@@ -469,12 +469,12 @@ export class RoundaboutResolver {
       );
 
     const currentBearing =
-      context.currentBearing ??
       this.routeEdgeBearing(
         context.routePoints,
         context.center,
         false
-      );
+      ) ??
+      context.currentBearing;
 
     const candidates =
       branches
