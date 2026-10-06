@@ -442,6 +442,28 @@ if(roundaboutManeuver){
   }
 }
 
+
+  // Fallback: se Valhalla non fornisce begin_lat/end_lat sulla
+  // manovra ROUNDABOUT, usiamo i punti della geometria selezionata.
+  if(!roundaboutPoints.length && Array.isArray(selectedPoints) && selectedPoints.length){
+    for(const p of selectedPoints){
+      if(Number.isFinite(Number(p?.lat)) && Number.isFinite(Number(p?.lon))){
+        roundaboutPoints.push({
+          lat: Number(p.lat),
+          lon: Number(p.lon),
+          label: "GEOMETRY"
+        });
+      }
+    }
+  }
+
+  console.log("=== ROUNDABOUT POINT SOURCE ===");
+  console.log(JSON.stringify({
+    roundaboutPoints: roundaboutPoints.length,
+    selectedPoints: Array.isArray(selectedPoints) ? selectedPoints.length : 0,
+    source: roundaboutPoints.length ? "ROUNDABOUT/FALLBACK" : "NONE"
+  }, null, 2));
+
 if(roundaboutPoints.length){
   const roundaboutLocate=await valhallaLocatePoints(config,roundaboutPoints);
 
