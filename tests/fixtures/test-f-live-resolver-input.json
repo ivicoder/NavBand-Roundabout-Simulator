@@ -1,0 +1,625 @@
+{
+  "currentRoad": "",
+  "nextRoad": "Via Jan Palach",
+  "currentEdges": {
+    "input_lat": 41.086,
+    "input_lon": 14.2566,
+    "edges": [
+      {
+        "access_restrictions": [],
+        "live_speed": {},
+        "correlated_lat": 41.08604,
+        "correlated_lon": 14.256601,
+        "side_of_street": "neither",
+        "bounding_circle": {
+          "lat": 41.086061,
+          "lon": 14.255916,
+          "radius": 80
+        },
+        "linear_reference": "KwojYR03fHLYAv9IAAUySCE=",
+        "percent_along": 0.12933,
+        "distance": 4.5,
+        "shoulder": false,
+        "heading": 271.7,
+        "outbound_reach": 100,
+        "inbound_reach": 100,
+        "edge_info": {
+          "way_id": 51338449,
+          "bike_network": {
+            "national": false,
+            "regional": false,
+            "local": false,
+            "mountain": false
+          },
+          "names": [
+            "Via Luigi Sturzo"
+          ],
+          "shape": "{fujmAcx`eZ|@}qAVq_@",
+          "mean_elevation": 42,
+          "speed_limit": 0,
+          "osm_node_ids": [
+            655149012,
+            1370949465,
+            8357048730
+          ]
+        },
+        "edge": {
+          "end_node": {
+            "level": 2,
+            "tile_id": 755337,
+            "id": 11783,
+            "value": 395377914954
+          },
+          "speeds": {
+            "default": 14,
+            "type": "classified",
+            "free_flow": 0,
+            "constrained_flow": 0,
+            "predicted": false
+          },
+          "access_restriction": false,
+          "start_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "end_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "part_of_complex_restriction": false,
+          "has_sign": false,
+          "toll": false,
+          "destination_only": false,
+          "destination_only_hgv": false,
+          "tunnel": false,
+          "bridge": false,
+          "round_about": false,
+          "traffic_signal": false,
+          "forward": false,
+          "not_thru": false,
+          "stop_sign": false,
+          "yield_sign": false,
+          "cycle_lane": "none",
+          "bike_network": false,
+          "truck_route": false,
+          "lane_count": 1,
+          "country_crossing": false,
+          "sidewalk_left": false,
+          "sidewalk_right": false,
+          "sac_scale": "none",
+          "deadend": false,
+          "geo_attributes": {
+            "length": 155,
+            "weighted_grade": -1.66,
+            "max_up_slope": 1,
+            "max_down_slope": -4,
+            "curvature": 0
+          },
+          "access": {
+            "bicycle": true,
+            "bus": true,
+            "car": true,
+            "emergency": false,
+            "HOV": true,
+            "pedestrian": true,
+            "taxi": true,
+            "truck": true,
+            "wheelchair": true,
+            "moped": true,
+            "motorcycle": true
+          },
+          "classification": {
+            "classification": "residential",
+            "use": "road",
+            "surface": "paved_smooth",
+            "link": false,
+            "internal": false
+          }
+        },
+        "edge_id": {
+          "level": 2,
+          "tile_id": 755337,
+          "id": 28022,
+          "value": 940268336202
+        },
+        "predicted_speeds": []
+      },
+      {
+        "access_restrictions": [],
+        "live_speed": {},
+        "correlated_lat": 41.08604,
+        "correlated_lon": 14.256601,
+        "side_of_street": "neither",
+        "bounding_circle": {
+          "lat": 0,
+          "lon": 0,
+          "radius": 0
+        },
+        "linear_reference": "KwojCx03fnLIAgC6//0yWN4=",
+        "percent_along": 0.87066,
+        "distance": 4.5,
+        "shoulder": false,
+        "heading": 91.7,
+        "outbound_reach": 100,
+        "inbound_reach": 100,
+        "edge_info": {
+          "way_id": 51338449,
+          "bike_network": {
+            "national": false,
+            "regional": false,
+            "local": false,
+            "mountain": false
+          },
+          "names": [
+            "Via Luigi Sturzo"
+          ],
+          "shape": "{fujmAcx`eZ|@}qAVq_@",
+          "mean_elevation": 42,
+          "speed_limit": 0,
+          "osm_node_ids": [
+            655149012,
+            1370949465,
+            8357048730
+          ]
+        },
+        "edge": {
+          "end_node": {
+            "level": 2,
+            "tile_id": 755337,
+            "id": 11775,
+            "value": 395109479498
+          },
+          "speeds": {
+            "default": 14,
+            "type": "classified",
+            "free_flow": 0,
+            "constrained_flow": 0,
+            "predicted": false
+          },
+          "access_restriction": false,
+          "start_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "end_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "part_of_complex_restriction": false,
+          "has_sign": false,
+          "toll": false,
+          "destination_only": false,
+          "destination_only_hgv": false,
+          "tunnel": false,
+          "bridge": false,
+          "round_about": false,
+          "traffic_signal": false,
+          "forward": true,
+          "not_thru": false,
+          "stop_sign": false,
+          "yield_sign": false,
+          "cycle_lane": "none",
+          "bike_network": false,
+          "truck_route": false,
+          "lane_count": 1,
+          "country_crossing": false,
+          "sidewalk_left": false,
+          "sidewalk_right": false,
+          "sac_scale": "none",
+          "deadend": false,
+          "geo_attributes": {
+            "length": 155,
+            "weighted_grade": 1.66,
+            "max_up_slope": 4,
+            "max_down_slope": -1,
+            "curvature": 0
+          },
+          "access": {
+            "bicycle": true,
+            "bus": true,
+            "car": true,
+            "emergency": false,
+            "HOV": true,
+            "pedestrian": true,
+            "taxi": true,
+            "truck": true,
+            "wheelchair": true,
+            "moped": true,
+            "motorcycle": true
+          },
+          "classification": {
+            "classification": "residential",
+            "use": "road",
+            "surface": "paved_smooth",
+            "link": false,
+            "internal": false
+          }
+        },
+        "edge_id": {
+          "level": 2,
+          "tile_id": 755337,
+          "id": 28044,
+          "value": 941006533706
+        },
+        "predicted_speeds": []
+      }
+    ],
+    "nodes": []
+  },
+  "targetEdges": {
+    "input_lat": 41.0877,
+    "input_lon": 14.2567,
+    "edges": [
+      {
+        "access_restrictions": [],
+        "live_speed": {},
+        "correlated_lat": 41.087726,
+        "correlated_lon": 14.256698,
+        "side_of_street": "neither",
+        "bounding_circle": {
+          "lat": 41.087735,
+          "lon": 14.256718,
+          "radius": 65
+        },
+        "linear_reference": "KwojfR03zHPXAv9w//wzR4I=",
+        "percent_along": 0.5107,
+        "distance": 2.9,
+        "shoulder": false,
+        "heading": 267.2,
+        "outbound_reach": 100,
+        "inbound_reach": 100,
+        "edge_info": {
+          "way_id": 231678915,
+          "bike_network": {
+            "national": false,
+            "regional": false,
+            "local": false,
+            "mountain": false
+          },
+          "names": [
+            "Via Jan Palach"
+          ],
+          "shape": "qoxjmAspeeZDvC`BptA",
+          "mean_elevation": 34,
+          "speed_limit": 30,
+          "osm_node_ids": [
+            3899815938,
+            12112535105,
+            1253082768
+          ]
+        },
+        "edge": {
+          "end_node": {
+            "level": 2,
+            "tile_id": 755337,
+            "id": 11779,
+            "value": 395243697226
+          },
+          "speeds": {
+            "default": 14,
+            "type": "classified",
+            "free_flow": 0,
+            "constrained_flow": 0,
+            "predicted": false
+          },
+          "access_restriction": false,
+          "start_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "end_restriction": {
+            "bicycle": false,
+            "bus": false,
+            "car": false,
+            "emergency": false,
+            "HOV": false,
+            "pedestrian": false,
+            "taxi": false,
+            "truck": false,
+            "wheelchair": false,
+            "moped": false,
+            "motorcycle": false
+          },
+          "part_of_complex_restriction": false,
+          "has_sign": false,
+          "toll": false,
+          "destination_only": false,
+          "destination_only_hgv": false,
+          "tunnel": false,
+          "bridge": false,
+          "round_about": false,
+          "traffic_signal": false,
+          "forward": true,
+          "not_thru": false,
+          "stop_sign": false,
+          "yield_sign": false,
+          "cycle_lane": "none",
+          "bike_network": false,
+          "truck_route": false,
+          "lane_count": 1,
+          "country_crossing": false,
+          "sidewalk_left": false,
+          "sidewalk_right": false,
+          "sac_scale": "none",
+          "deadend": false,
+          "geo_attributes": {
+            "length": 121,
+            "weighted_grade": 1.66,
+            "max_up_slope": 6,
+            "max_down_slope": -4,
+            "curvature": 0
+          },
+          "access": {
+            "bicycle": true,
+            "bus": true,
+            "car": true,
+            "emergency": false,
+            "HOV": true,
+            "pedestrian": true,
+            "taxi": true,
+            "truck": true,
+            "wheelchair": true,
+            "moped": true,
+            "motorcycle": true
+          },
+          "classification": {
+            "classification": "residential",
+            "use": "road",
+            "surface": "paved_smooth",
+            "link": false,
+            "internal": false
+          }
+        },
+        "edge_id": {
+          "level": 2,
+          "tile_id": 755337,
+          "id": 27998,
+          "value": 939463029834
+        },
+        "predicted_speeds": []
+      }
+    ],
+    "nodes": []
+  },
+  "radialEdges": [
+    {
+      "edgeId": 939161039946,
+      "wayId": 231084232,
+      "names": [
+        "Prolungamento Via Raffaele Perla"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "unclassified",
+      "correlatedLat": 41.088242,
+      "correlatedLon": 14.25747,
+      "percentAlong": 0.53667,
+      "shape": "knzjmAwpeeZtt@qBfE_@",
+      "probeRadius": 55,
+      "probeBearing": 0
+    },
+    {
+      "edgeId": 924128654410,
+      "wayId": 1307952225,
+      "names": [
+        "Via Jan Palach"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.087771,
+      "correlatedLon": 14.258005,
+      "percentAlong": 0.70081,
+      "shape": "srxjmA{qheZvApvA",
+      "probeRadius": 55,
+      "probeBearing": 45
+    },
+    {
+      "edgeId": 939395920970,
+      "wayId": 1307952226,
+      "names": [
+        "Via Jan Palach"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.087707,
+      "correlatedLon": 14.258153,
+      "percentAlong": 0.40412,
+      "shape": "}kxjmAeyeeZ_AgyA",
+      "probeRadius": 55,
+      "probeBearing": 105
+    },
+    {
+      "edgeId": 939865683018,
+      "wayId": 231084245,
+      "names": [
+        "Via Raffaele Perla"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.087323,
+      "correlatedLon": 14.257522,
+      "percentAlong": 0.64636,
+      "shape": "{lvjmAkseeZgUs@oOc@eVG",
+      "probeRadius": 55,
+      "probeBearing": 150
+    },
+    {
+      "edgeId": 940570326090,
+      "wayId": 386631282,
+      "names": [
+        "Via Jan Palach"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.087671,
+      "correlatedLon": 14.25704,
+      "percentAlong": 0.71946,
+      "shape": "{gxjmAatbeZsBm}A",
+      "probeRadius": 55,
+      "probeBearing": 225
+    },
+    {
+      "edgeId": 939463029834,
+      "wayId": 231678915,
+      "names": [
+        "Via Jan Palach"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.087732,
+      "correlatedLon": 14.256867,
+      "percentAlong": 0.39302,
+      "shape": "qoxjmAspeeZDvC`BptA",
+      "probeRadius": 55,
+      "probeBearing": 270
+    }
+  ],
+  "center": {
+    "lat": 41.08775015789474,
+    "lon": 14.257523
+  },
+  "routePoints": [
+    {
+      "lat": 41.087677,
+      "lon": 14.257525999999999
+    },
+    {
+      "lat": 41.087680999999996,
+      "lon": 14.257543
+    },
+    {
+      "lat": 41.087686999999995,
+      "lon": 14.257558
+    },
+    {
+      "lat": 41.087695,
+      "lon": 14.257570999999999
+    },
+    {
+      "lat": 41.087709,
+      "lon": 14.257584
+    },
+    {
+      "lat": 41.087725,
+      "lon": 14.257591999999999
+    },
+    {
+      "lat": 41.087741,
+      "lon": 14.257594
+    },
+    {
+      "lat": 41.087758,
+      "lon": 14.257589
+    },
+    {
+      "lat": 41.087772,
+      "lon": 14.257579999999999
+    },
+    {
+      "lat": 41.087784,
+      "lon": 14.257565999999999
+    },
+    {
+      "lat": 41.087792,
+      "lon": 14.257549
+    },
+    {
+      "lat": 41.087796999999995,
+      "lon": 14.257529
+    },
+    {
+      "lat": 41.087799,
+      "lon": 14.257508999999999
+    },
+    {
+      "lat": 41.087796,
+      "lon": 14.257489
+    },
+    {
+      "lat": 41.08779,
+      "lon": 14.25747
+    },
+    {
+      "lat": 41.087779999999995,
+      "lon": 14.257454
+    },
+    {
+      "lat": 41.087767,
+      "lon": 14.257442
+    },
+    {
+      "lat": 41.087753,
+      "lon": 14.257434
+    },
+    {
+      "lat": 41.08775,
+      "lon": 14.257358
+    }
+  ],
+  "currentLat": 41.086,
+  "currentLon": 14.2566,
+  "targetLat": 41.0877,
+  "targetLon": 14.2567
+}

@@ -1,0 +1,300 @@
+{
+  "currentRoad": "",
+  "nextRoad": "Via Pier Paolo Pasolini",
+  "currentEdges": {
+    "edges": [
+      {
+        "edgeId": 335953015882,
+        "wayId": 52060290,
+        "names": [
+          "Via Giacomo Leopardi"
+        ],
+        "roundabout": false,
+        "auto": true,
+        "use": "road",
+        "classification": "residential",
+        "correlatedLat": 41.061466,
+        "correlatedLon": 14.338161
+      },
+      {
+        "edgeId": 336422777930,
+        "wayId": 52060290,
+        "names": [
+          "Via Giacomo Leopardi"
+        ],
+        "roundabout": false,
+        "auto": true,
+        "use": "road",
+        "classification": "residential",
+        "correlatedLat": 41.061466,
+        "correlatedLon": 14.338161
+      }
+    ]
+  },
+  "targetEdges": {
+    "edges": [
+      {
+        "edgeId": 329141466186,
+        "wayId": 1137676705,
+        "names": [
+          "Via Pier Paolo Pasolini"
+        ],
+        "roundabout": false,
+        "auto": true,
+        "use": "road",
+        "classification": "residential",
+        "correlatedLat": 41.059501,
+        "correlatedLon": 14.3406
+      },
+      {
+        "edgeId": 329342792778,
+        "wayId": 1137676705,
+        "names": [
+          "Via Pier Paolo Pasolini"
+        ],
+        "roundabout": false,
+        "auto": true,
+        "use": "road",
+        "classification": "residential",
+        "correlatedLat": 41.059501,
+        "correlatedLon": 14.3406
+      }
+    ]
+  },
+  "radialEdges": [
+    {
+      "edgeId": 335483253834,
+      "wayId": 34300589,
+      "names": [
+        "Via Pier Paolo Pasolini"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.060084,
+      "correlatedLon": 14.339626,
+      "percentAlong": 0.0983,
+      "shape": "edbimAihfjZuL`HuaAvg@{UfN",
+      "probeRadius": 55,
+      "probeBearing": 0
+    },
+    {
+      "edgeId": 328772367434,
+      "wayId": 1137676709,
+      "names": [
+        "Via Pier Paolo Pasolini"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059832,
+      "correlatedLon": 14.339847,
+      "percentAlong": 0.43573,
+      "shape": "azaimA_ufjZ_CzC}AbCeBtB",
+      "probeRadius": 55,
+      "probeBearing": 30
+    },
+    {
+      "edgeId": 328671704138,
+      "wayId": 1137676706,
+      "names": [],
+      "roundabout": true,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059746,
+      "correlatedLon": 14.339964,
+      "percentAlong": 0.48796,
+      "shape": "ywaimAaxfjZi@h@]v@",
+      "probeRadius": 55,
+      "probeBearing": 45
+    },
+    {
+      "edgeId": 329141466186,
+      "wayId": 1137676705,
+      "names": [
+        "Via Pier Paolo Pasolini"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": false,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059583,
+      "correlatedLon": 14.340278,
+      "percentAlong": 0.10406,
+      "shape": "gbaimAiwhjZo@bCiAdFsBxKuEfY",
+      "probeRadius": 55,
+      "probeBearing": 60
+    },
+    {
+      "edgeId": 329242129482,
+      "wayId": 149111673,
+      "names": [
+        "Via Eugenio Montale"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059288,
+      "correlatedLon": 14.339838,
+      "percentAlong": 0.22892,
+      "shape": "chaimAeqfjZ~C^ll@tG",
+      "probeRadius": 55,
+      "probeBearing": 150
+    },
+    {
+      "edgeId": 334979937354,
+      "wayId": 52060277,
+      "names": [
+        "Via Umberto Saba"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059669,
+      "correlatedLon": 14.339445,
+      "percentAlong": 0.10979,
+      "shape": "msaimAyafjZoEzsAG|R",
+      "probeRadius": 55,
+      "probeBearing": 225
+    },
+    {
+      "edgeId": 335013491786,
+      "wayId": 1137676714,
+      "names": [
+        "Via Umberto Saba"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059654,
+      "correlatedLon": 14.339628,
+      "percentAlong": 0,
+      "shape": "msaimAyafjZXkF?EJ_C",
+      "probeRadius": 55,
+      "probeBearing": 240
+    },
+    {
+      "edgeId": 335281927242,
+      "wayId": 1137676713,
+      "names": [
+        "Via Umberto Saba"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "residential",
+      "correlatedLat": 41.059654,
+      "correlatedLon": 14.339628,
+      "percentAlong": 1,
+      "shape": "evaimAukfjZ\\rAl@fBJ~B",
+      "probeRadius": 55,
+      "probeBearing": 240
+    },
+    {
+      "edgeId": 355778021329,
+      "wayId": 93639280,
+      "names": [
+        "Viale Paul Harris"
+      ],
+      "roundabout": false,
+      "auto": true,
+      "forward": true,
+      "use": "road",
+      "classification": "tertiary",
+      "correlatedLat": 41.060015,
+      "correlatedLon": 14.341208,
+      "percentAlong": 0.78005,
+      "shape": "_vfimA_ejjZvLs@|DHjDj@pCpCnFpEvK~D|]jCtb@vBpCZvE`AzYhH`XbG",
+      "probeRadius": 75,
+      "probeBearing": 45
+    }
+  ],
+  "center": {
+    "lat": 41.059678875,
+    "lon": 14.339863562500001
+  },
+  "routePoints": [
+    {
+      "lat": 41.059923,
+      "lon": 14.339732999999999
+    },
+    {
+      "lat": 41.059809,
+      "lon": 14.339786
+    },
+    {
+      "lat": 41.059767,
+      "lon": 14.339792
+    },
+    {
+      "lat": 41.059717,
+      "lon": 14.339792
+    },
+    {
+      "lat": 41.059698999999995,
+      "lon": 14.339787
+    },
+    {
+      "lat": 41.059689999999996,
+      "lon": 14.339785
+    },
+    {
+      "lat": 41.059664,
+      "lon": 14.339789999999999
+    },
+    {
+      "lat": 41.059641,
+      "lon": 14.339806999999999
+    },
+    {
+      "lat": 41.059636,
+      "lon": 14.339813999999999
+    },
+    {
+      "lat": 41.059622999999995,
+      "lon": 14.339832999999999
+    },
+    {
+      "lat": 41.059612,
+      "lon": 14.339865
+    },
+    {
+      "lat": 41.05961,
+      "lon": 14.339898999999999
+    },
+    {
+      "lat": 41.059616,
+      "lon": 14.339932
+    },
+    {
+      "lat": 41.059626,
+      "lon": 14.339951999999998
+    },
+    {
+      "lat": 41.059622999999995,
+      "lon": 14.340059
+    },
+    {
+      "lat": 41.059605999999995,
+      "lon": 14.340190999999999
+    }
+  ],
+  "currentLat": 41.06149,
+  "currentLon": 14.33815,
+  "targetLat": 41.0595,
+  "targetLon": 14.3406
+}
