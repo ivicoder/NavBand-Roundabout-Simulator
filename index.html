@@ -25,13 +25,23 @@
       <label>Mode
         <select id="modeSelect"><option value="replay">Replay</option><option value="live">Live</option></select>
       </label>
-      <label>Scenario
+    <div id="replayControls">
+      <label>Scenario Replay
         <select id="scenarioSelect"></select>
       </label>
       <div class="button-row">
         <button id="loadScenarioBtn" class="secondary">Carica</button>
         <button id="saveScenarioBtn" class="secondary">Salva JSON</button>
       </div>
+    </div>
+
+    <div id="liveTestRow" style="display:none">
+      <label>Test Live
+        <select id="liveTestSelect">
+          <option value="test-b-live">Test B Live — Via San Leucio → Via Gennaro Papa</option>
+        </select>
+      </label>
+    </div>
     </section>
 
     <section>

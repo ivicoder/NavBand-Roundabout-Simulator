@@ -65,8 +65,50 @@ function setModeUI() {
   const live = $("modeSelect").value === "live";
   $("liveSettings").style.display = live ? "block" : "none";
   $("statusPill").textContent = live ? "LIVE" : "REPLAY";
+
+  $("replayControls").style.display = live ? "none" : "block";
+  $("liveTestRow").style.display = live ? "block" : "none";
+
+  if (live) {
+    loadLiveTest($("liveTestSelect").value);
+  }
 }
 function setInput(id, value) { $(id).value = value ?? ""; }
+const LIVE_TESTS = {
+  "test-b-live": {
+    id: "test-b-live",
+    name: "Test B Live — Via San Leucio → Via Gennaro Papa",
+    maneuver: "ROUNDABOUT",
+    currentRoad: "Via San Leucio",
+    targetRoad: "Via Gennaro Papa",
+    expectedExit: "",
+    heading: "",
+    lat: 41.090580,
+    lon: 14.317530,
+    targetLat: 41.1006487,
+    targetLon: 14.3235474
+  }
+};
+
+function loadLiveTest(id) {
+  const test = LIVE_TESTS[id];
+  if (!test) return;
+
+  state.currentScenario = test;
+
+  setInput("maneuverSelect", test.maneuver);
+  setInput("currentRoad", test.currentRoad);
+  setInput("targetRoad", test.targetRoad);
+  setInput("expectedExit", test.expectedExit);
+  setInput("heading", test.heading);
+  setInput("lat", test.lat);
+  setInput("lon", test.lon);
+  setInput("targetLat", test.targetLat);
+  setInput("targetLon", test.targetLon);
+
+  paintMarkers();
+}
+
 function readScenarioFromUI() {
   return {
     id: state.currentScenario?.id || `custom-${Date.now()}`,
@@ -528,6 +570,9 @@ async function loadScenarios(){const r=await fetch("data/scenarios.json",{cache:
 function browserLocate(){if(!navigator.geolocation){alert("Geolocalizzazione browser non disponibile.");return}navigator.geolocation.getCurrentPosition(p=>{setInput("lat",p.coords.latitude.toFixed(6));setInput("lon",p.coords.longitude.toFixed(6));if(Number.isFinite(p.coords.heading))setInput("heading",Number(p.coords.heading).toFixed(1));paintMarkers()},e=>alert(`GPS browser non disponibile: ${e.message}`),{enableHighAccuracy:true,timeout:12000,maximumAge:10000})}
 function setupEvents(){
   $("modeSelect").addEventListener("change",setModeUI);
+  $("liveTestSelect").addEventListener("change",()=>{
+    loadLiveTest($("liveTestSelect").value);
+  });
   $("scenarioSelect").addEventListener("change",()=>{const s=state.scenarios.find(x=>x.id===$("scenarioSelect").value);if(s)loadScenario(s)});
   $("loadScenarioBtn").addEventListener("click",()=>{const s=state.scenarios.find(x=>x.id===$("scenarioSelect").value);if(s)loadScenario(s)});
   $("saveScenarioBtn").addEventListener("click",exportScenario); $("locateBtn").addEventListener("click",browserLocate);
