@@ -193,6 +193,7 @@ function renderResult(result,evaluation){
 }
 function configFromUI(){return{baseUrl:$("valhallaBase").value.trim()||DEFAULT_BASE,apiKey:$("apiKey").value.trim(),clientId:$("clientId").value.trim()}}
 async function analyze(){
+  let selectedPoints = [];
   const mode=$("modeSelect").value, scenario=readScenarioFromUI(); $("analyzeBtn").disabled=true; $("analyzeBtn").textContent="ANALISI…"; $("summaryText").textContent="Analisi in corso…";
   try{
     let routeResult=null,locateResult=null;
@@ -235,7 +236,7 @@ locateResult=await valhallaLocate(config,scenario);
     const windowStart = Math.max(0, maneuverStartMeters - 35);
     const windowEnd = maneuverStartMeters + maneuverLengthMeters + 35;
 
-    const selectedPoints = [];
+
     let cumulative = 0;
 
     for (let i = 0; i < routePoints.length; i++) {
