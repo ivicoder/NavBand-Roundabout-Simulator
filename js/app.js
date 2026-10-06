@@ -1,51 +1,65 @@
 
 /* ============================================================
-   NAVBAND RADIAL PROBES CAPTURE
+   RIMOZIONE PANNELLO LEGACY RADIAL PROBES
    ============================================================ */
-(() => {
-  if (window.__navbandRadialCaptureInstalled) return;
+function removeLegacyRadialPanel() {
+  const toolbar = document.getElementById("navbandRadialToolbar");
+  if (!toolbar) return false;
 
-  window.__navbandRadialCaptureInstalled = true;
+  const table = document.getElementById("navbandRadialTable");
+  const summary = document.getElementById("navbandRadialSummary");
 
-  const originalConsoleLog = console.log;
+  let panel = toolbar;
 
-  console.log = function (...args) {
-    try {
-      for (const arg of args) {
-        if (typeof arg !== "string") continue;
+  while (panel && panel !== document.body) {
+    const containsTable = table ? panel.contains(table) : true;
+    const containsSummary = summary ? panel.contains(summary) : true;
 
-        if (
-          arg.includes('"radialEdges"') &&
-          arg.includes('"probeCount"') &&
-          arg.includes('"center"')
-        ) {
-          try {
-            const parsed = JSON.parse(arg);
-
-            if (
-              parsed &&
-              Array.isArray(parsed.radialEdges)
-            ) {
-              window.__navbandRadialProbes = parsed;
-
-              window.dispatchEvent(
-                new CustomEvent("navband:radial-probes", {
-                  detail: parsed
-                })
-              );
-            }
-          } catch (_) {
-            // Il log non era JSON valido: ignoriamo.
-          }
-        }
-      }
-    } catch (_) {
-      // La diagnostica non deve mai rompere console.log.
+    if (containsTable && containsSummary) {
+      panel.remove();
+      return true;
     }
 
-    return originalConsoleLog.apply(console, args);
-  };
-})();
+    panel = panel.parentElement;
+  }
+
+  return false;
+}
+
+function startLegacyRadialPanelCleanup() {
+  if (!document.body) return;
+
+  if (removeLegacyRadialPanel()) return;
+
+  const observer = new MutationObserver(() => {
+    if (removeLegacyRadialPanel()) {
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  setTimeout(() => {
+    observer.disconnect();
+    removeLegacyRadialPanel();
+  }, 10000);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    startLegacyRadialPanelCleanup,
+    { once: true }
+  );
+} else {
+  startLegacyRadialPanelCleanup();
+}
+
+
+
 
 import { DEFAULT_BASE, valhallaLocate, valhallaLocatePoints, valhallaRoute } from "./valhalla.js";
 import { analyzeScenario, evaluateExpectedExit } from "./resolver.js";
@@ -521,11 +535,22 @@ if(roundaboutPoints.length){
     }
   }
 
-  console.log(JSON.stringify({
+  window.__navbandRadialProbes = {
     center,
     probeCount: probePoints.length,
     radialEdges
-  }, null, 2));
+  };
+
+  window.dispatchEvent(
+    new CustomEvent("navband:radial-probes", {
+      detail: window.__navbandRadialProbes
+    })
+  );
+
+  console.log(
+    "=== ROUNDABOUT RADIAL PROBES ===",
+    window.__navbandRadialProbes
+  );
 
 
   console.log("=== ROUNDABOUT LOCATE ===");
