@@ -63,6 +63,8 @@ if (document.readyState === "loading") {
 
 import { DEFAULT_BASE, valhallaLocate, valhallaLocatePoints, valhallaRoute } from "./valhalla.js";
 import { analyzeScenario, evaluateExpectedExit } from "./resolver.js";
+import RoundaboutResolver from "./roundabout-resolver.js";
+const roundaboutResolver = new RoundaboutResolver();
 
 const $ = (id) => document.getElementById(id);
 const state = { scenarios: [], currentScenario: null, result: null, map: null, currentMarker: null, targetMarker: null, routeLayer: null };
@@ -663,7 +665,74 @@ if(roundaboutPoints.length){
 }
 
     }
-    paintRoute(routeResult); const result=analyzeScenario({scenario,routeResult,locateResult}); const evaluation=evaluateExpectedExit(result,scenario.expectedExit); state.result=result; renderResult(result,evaluation);
+    paintRoute(routeResult);
+
+    let result = analyzeScenario({
+      scenario,
+      routeResult,
+      locateResult
+    });
+
+    if (
+      mode === "live" &&
+      scenario.maneuver === "ROUNDABOUT" &&
+      window.__navbandRadialProbes &&
+      Array.isArray(
+        window.__navbandRadialProbes.radialEdges
+      ) &&
+      window.__navbandRadialProbes.radialEdges.length
+    ) {
+      const geometricResult =
+        roundaboutResolver.resolve({
+          currentRoad:
+            scenario.currentRoad,
+
+          nextRoad:
+            scenario.targetRoad,
+
+          currentEdges:
+            locateResult?.[0],
+
+          targetEdges:
+            locateResult?.[1],
+
+          radialEdges:
+            window.__navbandRadialProbes.radialEdges,
+
+          center:
+            window.__navbandRadialProbes.center,
+
+          routePoints:
+            selectedPoints
+        });
+
+      console.log(
+        "=== GEOMETRIC ROUNDABOUT RESOLVER ===",
+        geometricResult
+      );
+
+      if (
+        geometricResult &&
+        geometricResult.predictedExit != null
+      ) {
+        result = {
+          ...result,
+          ...geometricResult
+        };
+      }
+    }
+
+    const evaluation =
+      evaluateExpectedExit(
+        result,
+        scenario.expectedExit
+      );
+
+    state.result = result;
+    renderResult(
+      result,
+      evaluation
+    );
   }catch(error){state.result=null;$("confidenceBadge").className="badge low";$("confidenceBadge").textContent="ERROR";$("exitValue").textContent="!";$("scoreValue").textContent="Analisi non disponibile";$("summaryText").textContent=error?.message||String(error);$("debugOutput").textContent=String(error?.stack||error)}finally{$("analyzeBtn").disabled=false;$("analyzeBtn").textContent="ANALIZZA SCENARIO"}
 }
 function exportScenario(){const s=readScenarioFromUI();const blob=new Blob([JSON.stringify(s,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`${(s.name||"scenario").toLowerCase().replace(/[^a-z0-9]+/g,"_")}.json`;a.click();URL.revokeObjectURL(url)}
