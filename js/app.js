@@ -89,6 +89,7 @@ function setModeUI() {
 }
 function setInput(id, value) { $(id).value = value ?? ""; }
 const LIVE_TESTS = {
+
   "test-b-live": {
     id: "test-b-live",
     name: "Test B Live — Via San Leucio → Via Gennaro Papa",
@@ -101,6 +102,58 @@ const LIVE_TESTS = {
     lon: 14.317530,
     targetLat: 41.1006487,
     targetLon: 14.3235474
+  },
+  "test-c-live": {
+    id: "test-c-live",
+    name: "Test C Live — Via San Leucio → Via Catauli",
+    maneuver: "ROUNDABOUT",
+    currentRoad: "Via San Leucio",
+    targetRoad: "Via Catauli",
+    expectedExit: "2",
+    heading: "",
+    lat: 41.090580,
+    lon: 14.317530,
+    targetLat: 41.095975,
+    targetLon: 14.319169
+  },
+  "test-d-live": {
+    id: "test-d-live",
+    name: "Test D Live — Via San Leucio → Via Caprioli",
+    maneuver: "ROUNDABOUT",
+    currentRoad: "Via San Leucio",
+    targetRoad: "Via Caprioli",
+    expectedExit: "5",
+    heading: "",
+    lat: 41.090580,
+    lon: 14.317530,
+    targetLat: 41.095928,
+    targetLon: 14.317027
+  },
+  "test-e-live": {
+    id: "test-e-live",
+    name: "Test E Live — San Nicola → Via Pier Paolo Pasolini",
+    maneuver: "ROUNDABOUT",
+    currentRoad: "",
+    targetRoad: "Via Pier Paolo Pasolini",
+    expectedExit: "3",
+    heading: "",
+    lat: 41.06149,
+    lon: 14.33815,
+    targetLat: 41.05740,
+    targetLon: 14.34130
+  },
+  "test-f-live": {
+    id: "test-f-live",
+    name: "Test F Live — Via Jan Palach",
+    maneuver: "ROUNDABOUT",
+    currentRoad: "",
+    targetRoad: "Via Jan Palach",
+    expectedExit: "3",
+    heading: "",
+    lat: 41.0860,
+    lon: 14.2566,
+    targetLat: 41.0877,
+    targetLon: 14.2567
   }
 };
 
