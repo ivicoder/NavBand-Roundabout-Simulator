@@ -43,9 +43,15 @@ export class RoundaboutResolver {
       context.routePoints
     );
 
+    const entryBearing =
+      context.currentBearing ??
+      entry?.bearing ??
+      null;
+
     const ordered = this.orderBranches(
       branches,
       entry,
+      entryBearing,
       direction
     );
 
@@ -65,8 +71,11 @@ export class RoundaboutResolver {
 
     const entryStrong =
       Boolean(
-        entry &&
-        entry.entryScore >= 500
+        context.currentBearing != null ||
+        (
+          entry &&
+          entry.entryScore >= 500
+        )
       );
 
     const targetStrong =
@@ -206,6 +215,36 @@ export class RoundaboutResolver {
     const center =
       this.normalizePoint(input.center);
 
+    const currentBearing =
+      center &&
+      this.isFinitePoint(
+        input.currentLat,
+        input.currentLon
+      )
+        ? this.bearingFromCenter(
+            center,
+            {
+              lat: Number(input.currentLat),
+              lon: Number(input.currentLon)
+            }
+          )
+        : null;
+
+    const targetBearing =
+      center &&
+      this.isFinitePoint(
+        input.targetLat,
+        input.targetLon
+      )
+        ? this.bearingFromCenter(
+            center,
+            {
+              lat: Number(input.targetLat),
+              lon: Number(input.targetLon)
+            }
+          )
+        : null;
+
     const routePoints =
       Array.isArray(input.routePoints)
         ? input.routePoints
@@ -228,6 +267,8 @@ export class RoundaboutResolver {
       targetEdges,
       radialEdges,
       center,
+      currentBearing,
+      targetBearing,
       routePoints
     };
   }
@@ -423,63 +464,83 @@ export class RoundaboutResolver {
       new Set(
         context.currentEdges
           .map(edge => edge.wayId)
-          .filter(
-            id => id != null
-          )
+          .filter(id => id != null)
           .map(String)
       );
 
-    const firstRouteBearing =
+    const currentBearing =
+      context.currentBearing ??
       this.routeEdgeBearing(
         context.routePoints,
         context.center,
         false
       );
 
-    const best = branches
-      .map(branch => {
-        const wayMatch =
-          branch.wayIds.some(
-            id =>
-              currentWayIds.has(
-                String(id)
-              )
-          );
+    const candidates =
+      branches
+        .map(branch => {
+          const wayMatch =
+            branch.wayIds.some(
+              id =>
+                currentWayIds.has(
+                  String(id)
+                )
+            );
 
-        const roadScore =
-          this.scoreRoadMatch(
-            branch.names,
-            context.currentRoad
-          );
+          const roadScore =
+            this.scoreRoadMatch(
+              branch.names,
+              context.currentRoad
+            );
 
-        const angleScore =
-          firstRouteBearing == null
-            ? 0
-            : Math.max(
-                0,
-                100 -
-                  this.angularDistance(
-                    branch.bearing,
-                    firstRouteBearing
-                  )
-              );
+          const angleScore =
+            currentBearing == null
+              ? 0
+              : Math.max(
+                  0,
+                  100 -
+                    this.angularDistance(
+                      branch.bearing,
+                      currentBearing
+                    )
+                );
 
-        return {
-          branch,
-          score:
-            (wayMatch ? 1000 : 0) +
-            roadScore * 5 +
-            angleScore
-        };
-      })
-      .sort(
-        (a, b) =>
-          b.score - a.score
-      )[0];
+          return {
+            branch,
+            wayMatch,
+            roadScore,
+            score:
+              (wayMatch ? 1000 : 0) +
+              roadScore * 5 +
+              angleScore
+          };
+        })
+        .sort(
+          (a, b) =>
+            b.score - a.score
+        );
 
-    if (!best) return null;
+    const best = candidates[0];
 
-    best.branch.entryScore = best.score;
+    if (!best) {
+      return null;
+    }
+
+    if (
+      !best.wayMatch &&
+      best.roadScore === 0
+    ) {
+      return null;
+    }
+
+    best.branch.entryScore =
+      best.score;
+
+    best.branch.entryWayMatch =
+      best.wayMatch;
+
+    best.branch.entryRoadScore =
+      best.roadScore;
 
     return best.branch;
   }
@@ -558,10 +619,16 @@ export class RoundaboutResolver {
   orderBranches(
     branches,
     entry,
+    entryBearing,
     direction
   ) {
     const entryId =
       entry?.branchId ?? null;
+
+    const startBearing =
+      entryBearing ??
+      entry?.bearing ??
+      0;
 
     return branches
       .filter(
@@ -573,11 +640,11 @@ export class RoundaboutResolver {
         traversalDistance:
           direction < 0
             ? this.ccwDistance(
-                entry?.bearing ?? 0,
+                startBearing,
                 branch.bearing
               )
             : this.cwDistance(
-                entry?.bearing ?? 0,
+                startBearing,
                 branch.bearing
               )
       }))
@@ -992,6 +1059,13 @@ export class RoundaboutResolver {
     }
 
     return { lat, lon };
+  }
+
+  isFinitePoint(lat, lon) {
+    return (
+      Number.isFinite(Number(lat)) &&
+      Number.isFinite(Number(lon))
+    );
   }
 
   numberOrNull(value) {

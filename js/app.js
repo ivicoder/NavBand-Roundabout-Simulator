@@ -702,7 +702,19 @@ if(roundaboutPoints.length){
             window.__navbandRadialProbes.center,
 
           routePoints:
-            selectedPoints
+            selectedPoints,
+
+          currentLat:
+            scenario.lat,
+
+          currentLon:
+            scenario.lon,
+
+          targetLat:
+            scenario.targetLat,
+
+          targetLon:
+            scenario.targetLon
         });
 
       console.log(
